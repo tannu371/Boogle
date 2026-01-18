@@ -33,12 +33,16 @@ app.use(express.urlencoded({ extended: true }));
 app.use(
   session({
     store: new SQLiteStore(),
-    secret: "fuckU",
+    secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
-    cookie: { maxAge: 360000, secure: false },
-  })
+    cookie: {
+      maxAge: 360000,
+      secure: process.env.NODE_ENV === "production",
+    },
+  }),
 );
+
 
 async function getSaved(username) {
   const result = await db.query(
