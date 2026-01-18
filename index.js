@@ -264,40 +264,55 @@ app.post("/post", upload.single("image"), async (req, res) => {
   }
 });
 
-// update blog post and back to /
 app.post("/update/:id", upload.single("image"), async (req, res) => {
-  const { path, originalname, mimetype } = req.file;
-  const fileData = fs.readFileSync(path);
-
   const id = parseInt(req.params.id);
   const time = new Date();
   const title = req.body.title;
   const description = req.body.description;
-  try {
-    var result = await db.query("SELECT id FROM images WHERE data = $1", [
-      fileData,
-    ]);
 
-    if (result.rowCount == 0) {
-      result = await db.query(
-        "INSERT INTO images(name, data, mimetype) values ($1, $2, $3) RETURNING id;",
-        [originalname, fileData, mimetype]
+  try {
+    let image_id;
+
+    // ✅ Only handle image if user uploaded one
+    if (req.file) {
+      const { path, originalname, mimetype } = req.file;
+      const fileData = fs.readFileSync(path);
+
+      let result = await db.query("SELECT id FROM images WHERE data = $1", [
+        fileData,
+      ]);
+
+      if (result.rowCount === 0) {
+        result = await db.query(
+          "INSERT INTO images(name, data, mimetype) VALUES ($1, $2, $3) RETURNING id;",
+          [originalname, fileData, mimetype],
+        );
+      }
+
+      image_id = result.rows[0].id;
+      fs.unlinkSync(path); // remove temp file
+    }
+
+    // ✅ Update query changes depending on image upload
+    if (image_id) {
+      await db.query(
+        "UPDATE blogs SET post_time = $1, blog_title = $2, blog_description = $3, image_id = $4 WHERE id = $5;",
+        [time, title, description, image_id, id],
+      );
+    } else {
+      await db.query(
+        "UPDATE blogs SET post_time = $1, blog_title = $2, blog_description = $3 WHERE id = $4;",
+        [time, title, description, id],
       );
     }
-    const image_id = result.rows[0].id;
 
-    await db.query(
-      "UPDATE blogs SET post_time = $1, blog_title = $2, blog_description = $3, image_id = $4 WHERE id = $5;",
-      [time, title, description, image_id, id]
-    );
-
-    fs.unlinkSync(path); // remove temp file
     res.redirect("/");
   } catch (err) {
-    console.log(err);
+    console.error(err);
     res.redirect("/");
   }
 });
+
 
 // get user created blogs
 app.get("/myPosts", async (req, res) => {
@@ -323,6 +338,7 @@ app.get("/myPosts", async (req, res) => {
 
 // delete blog
 app.post("/delete", async (req, res) => {
+  console.log(req.body);
   const blogId = parseInt(req.body.id);
   await db.query("DELETE FROM blogs WHERE id = $1;", [blogId]);
   res.redirect("/");

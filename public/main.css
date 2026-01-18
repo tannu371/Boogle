@@ -10,7 +10,7 @@ body {
 button {
   background: none;
   border: #c1d6f7;
-  border-radius: 5%;
+  border-radius: 100px;
 }
 
 button:hover {
