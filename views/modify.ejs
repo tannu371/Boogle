@@ -6,7 +6,7 @@
                 <input id="title-input" type="text" name="title" value="<%= blog.blog_title %>"> <br>
                 <label for="image"> <img id="imageImg" src=/image/<%=blog.image_id %> height="200"> </label>
                 <input id="image" type="file" name="image" accept="image/*" style="display: none;"
-                    onchange="renderImg(event, id)">
+                    onchange="renderImg(event)">
                 <br>
                 <textarea name="description"> <%= blog.blog_description %>
                                                 </textarea> <br>

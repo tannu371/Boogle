@@ -107,8 +107,19 @@
                 <% } %>
 
                     <% } else { %>
-                        <h3 style="text-align:center;"> No Blogs Yet! Start jotting down using create button.</h3>
-                        <% } %>
+                        <% if (pageType==="saved" ) { %>
+                            <h3 style="text-align:center;">
+                                No saved blogs yet 📌 <br>
+                                Mark blogs as saved using the button beside a blog.
+                            </h3>
+                            <% } else { %>
+                                <h3 style="text-align:center;">
+                                    No blogs yet ✍️ <br>
+                                    Start jotting down using the create button.
+                                </h3>
+                                <% } %>
+                        
+                                    <% } %>
     </div>
 
     <script>

@@ -47,8 +47,6 @@ app.use(
   }),
 );
 
-
-
 async function getSaved(username) {
   const result = await db.query(
     "SELECT blog_id FROM saved_blog WHERE user_name = $1;",
@@ -71,7 +69,12 @@ app.get("/", async (req, res) => {
       const username = req.session.user.user_name;
       const saved = await getSaved(username);
   
-      res.render("index.ejs", { user: req.session.user, blogs: result.rows, saved : saved });
+      res.render("index.ejs", {
+        pageType: "home",
+        user: req.session.user,
+        blogs: result.rows,
+        saved: saved,
+      });
     } else {
       res.render("index.ejs", { blogs: result.rows, saved:[] });
     }
@@ -90,7 +93,7 @@ app.get("/blog/:id", async (req, res) => {
     const blog = result.rows[0];
 
     if (req.session.user) {
-      res.render("blogView.ejs", { user: req.session.user, blog: blog });
+      res.render("blogView", { user: req.session.user, blog: blog });
     } else {
       res.render("blogView.ejs", { blog: blog });
     }
@@ -123,9 +126,10 @@ app.get("/saved", async (req, res) => {
    const saved = await getSaved(username);
 
    res.render("index.ejs", {
+     pageType: "saved",
      user: req.session.user,
      blogs: result.rows,
-     saved : saved,
+     saved: saved,
    });
 });
 
@@ -368,6 +372,7 @@ app.get("/myPosts", async (req, res) => {
     const saved = await getSaved(username);
 
     res.render("index.ejs", {
+      pageType: "myPost",
       user: req.session.user,
       blogs: result.rows,
       saved : saved,
