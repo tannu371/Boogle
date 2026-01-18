@@ -1,3 +1,13 @@
+// Hide server-side messages after 3 seconds
+document.addEventListener("DOMContentLoaded", () => {
+  const msg = document.getElementById("message");
+  if (msg && msg.textContent.trim() !== "") {
+    setTimeout(() => {
+      msg.style.display = "none";
+    }, 3000);
+  }
+});
+
 $("input[type='password']").click(() => {
   $(".left img").attr("src", "images/cover.png");
 });
@@ -35,7 +45,6 @@ $("#text-area").blur(function () {
   if ($(this).val() == "") $(this).val(standard_message);
 });
 
-
 function generateMsg(e, x) {
   e.preventDefault();
   const msgElem = document.getElementById("msg");
@@ -52,7 +61,10 @@ function generateMsg(e, x) {
 }
 
 function changeColor(id) {
-          document.getElementById(id).querySelectorAll("svg path").forEach((elem)=>{
-            elem.style.fill = "orange";
-          })
-        }
+  document
+    .getElementById(id)
+    .querySelectorAll("svg path")
+    .forEach((elem) => {
+      elem.style.fill = "orange";
+    });
+}

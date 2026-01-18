@@ -137,15 +137,15 @@ app.get("/signUp", (req, res) => {
 // register/signup
 app.post("/register", upload.single("dp"), async (req, res) => {
   try {
-    // 1. Check file
     if (!req.file) {
-      return res.status(400).send("Profile picture is required");
+      return res.render("signUp.ejs", {
+        error: "❌ Profile picture is required",
+      });
     }
 
     const { originalname, mimetype, path } = req.file;
     const fileData = fs.readFileSync(path);
 
-    // 2. Insert image
     const imageResult = await db.query(
       `INSERT INTO images (name, mimetype, data)
        VALUES ($1, $2, $3)
@@ -158,8 +158,6 @@ app.post("/register", upload.single("dp"), async (req, res) => {
     fs.unlinkSync(path);
 
     const imageId = imageResult.rows[0].id;
-
-    // 3. Insert user
     const { username, email, password } = req.body;
 
     await db.query(
@@ -167,17 +165,19 @@ app.post("/register", upload.single("dp"), async (req, res) => {
       [username, email, password, imageId],
     );
 
-    // 4. Redirect (NOT render)
     res.redirect("/login");
   } catch (err) {
     console.error("Register error:", err);
 
     if (err.code === "23505") {
-      // unique constraint violation
-      return res.status(400).send("Username already exists");
+      return res.render("signUp.ejs", {
+        error: "❌ Username already exists",
+      });
     }
 
-    res.status(500).send("Registration failed");
+    res.render("signUp.ejs", {
+      error: "❌ Registration failed. Please try again.",
+    });
   }
 });
 
