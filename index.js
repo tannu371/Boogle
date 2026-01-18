@@ -136,27 +136,51 @@ app.get("/signUp", (req, res) => {
 
 // register/signup
 app.post("/register", upload.single("dp"), async (req, res) => {
-  const { originalname, mimetype, path } = req.file;
-  const fileData = fs.readFileSync(path);
+  try {
+    // 1. Check file
+    if (!req.file) {
+      return res.status(400).send("Profile picture is required");
+    }
 
-  // Insert into `images` table
-  const imageResult = await db.query(
-    "INSERT INTO images (name, mimetype, data) VALUES ($1, $2, $3) ON CONFLICT(data_hash) DO UPDATE SET name = EXCLUDED.name RETURNING id",
-    [originalname, mimetype, fileData]
-  );
+    const { originalname, mimetype, path } = req.file;
+    const fileData = fs.readFileSync(path);
 
-  fs.unlinkSync(path); // remove temp file
+    // 2. Insert image
+    const imageResult = await db.query(
+      `INSERT INTO images (name, mimetype, data)
+       VALUES ($1, $2, $3)
+       ON CONFLICT (data_hash)
+       DO UPDATE SET name = EXCLUDED.name
+       RETURNING id`,
+      [originalname, mimetype, fileData],
+    );
 
-  const imageId = imageResult.rows[0].id;
+    fs.unlinkSync(path);
 
-  const username = req.body.username;
-  const email = req.body.email;
-  const password = req.body.password;
+    const imageId = imageResult.rows[0].id;
 
-  await db.query("INSERT INTO users(user_name, email, password, image_id) values ($1, $2, $3, $4);", [username, email, password, imageId]);
+    // 3. Insert user
+    const { username, email, password } = req.body;
 
-  res.render("logIn.ejs");
+    await db.query(
+      "INSERT INTO users (user_name, email, password, image_id) VALUES ($1, $2, $3, $4)",
+      [username, email, password, imageId],
+    );
+
+    // 4. Redirect (NOT render)
+    res.redirect("/login");
+  } catch (err) {
+    console.error("Register error:", err);
+
+    if (err.code === "23505") {
+      // unique constraint violation
+      return res.status(400).send("Username already exists");
+    }
+
+    res.status(500).send("Registration failed");
+  }
 });
+
 
 // login and redirect to /
 app.post("/", async (req, res) => {
