@@ -3,21 +3,30 @@ import session from "express-session";
 import multer from "multer"; // middleware to handle file uploads
 import fs from "fs"; // read file data
 import pg from "pg";
+import "dotenv/config";
 
 const SQLiteStore = (await import("connect-sqlite3")).default(session);
 const upload = multer({ dest: "uploads/" }); // Temp folder
 
 const app = express(); // create express application
-const port = 3000;
+
+const PORT = process.env.PORT || 3000;
+
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});
+
 
 const db = new pg.Client({
-  user: "postgres",
-  host: "localhost",
-  database: "blog",
-  password: "123456",
-  port: 5433,
+  connectionString: process.env.DATABASE_URL,
+  ssl:
+    process.env.NODE_ENV === "production"
+      ? { rejectUnauthorized: false }
+      : false,
 });
 db.connect();
+
+export default db;
 
 app.use(express.static("public"));
 app.use(express.urlencoded({ extended: true }));
