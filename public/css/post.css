@@ -1,0 +1,58 @@
+/* post/edit page  */
+
+.post {
+  display: flex;
+  justify-content: center;
+}
+
+.post > form {
+  background-color: white;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 1vh 1vw;
+  border-radius: 20px;
+  outline: 1px inset rgb(17, 45, 66);
+  box-shadow: 3px 3px 5px rgb(17, 45, 66);
+}
+
+#title-input {
+  font-family: var(--title-font);
+  font-size: 20px;
+  width: 50vw;
+  outline: none;
+}
+
+textarea {
+  height: 30vh;
+  width: 50vw;
+  border-width: 0px;
+  font-size: 15px;
+  resize: none;
+}
+
+textarea:focus {
+  outline: none;
+  word-spacing: 0.1;
+}
+
+#publish_btn {
+  background-color: green;
+  color: white;
+  border: 2px solid darkgreen;
+  border-radius: 20px;
+}
+
+@media (max-width: 768px) {
+  #title-input,
+  textarea {
+    width: 95vw;
+  }
+  #title-input {
+    font-size: 0.85rem;
+  }
+  textarea {
+    font-size: 0.75rem;
+  }
+
+}

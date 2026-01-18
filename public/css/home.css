@@ -1,0 +1,81 @@
+.blog-card {
+  display: flex;
+  background-color: var(--nav-color);
+  outline: 1px inset var(--primary-color);
+  box-shadow: 3px 3px 5px var(--accent-color);
+  margin: 2vh 10vw;
+}
+
+.blog-card img {
+  width: 30vw;
+  margin: 2vw;
+  flex-shrink: 0; /* Prevents the image from squishing */
+}
+
+.content {
+  margin: 2vw;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.content-header {
+  display: flex;
+  justify-content: space-between; /* Pushes title left, button right */
+  gap: 2vw;
+}
+
+.save-btn {
+  align-self: flex-start;
+}
+
+.btn {
+  margin-top: auto;
+  display: flex;
+  justify-content: flex-end;
+  gap: 2vw;
+}
+
+.time {
+  font-size: x-small;
+  color: grey;
+}
+
+.content p {
+  font-family: var(--para-font);
+  margin: 0 1vw 1vw 0;
+}
+
+.clamp {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 5; /* Number of lines to show before truncating */
+  -webkit-box-orient: vertical;
+  line-clamp: 4; /* Standard property to satisfy the validator */
+}
+
+@media (max-width: 768px) {
+  .blog-card {
+    margin: 2vh;
+  }
+
+  .clamp {
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 3; /* Number of lines to show before truncating */
+    -webkit-box-orient: vertical;
+    line-clamp: 3; /* Standard property to satisfy the validator */
+  }
+
+  .content h3 {
+    font-size: 0.75rem;
+  }
+
+  .content p.time {
+    font-size: 0.5rem;
+  }
+
+  .content p {
+    font-size: 0.65rem;
+  }
+}

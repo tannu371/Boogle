@@ -1,0 +1,98 @@
+.auth {
+  display: flex;
+  justify-content: space-evenly;
+  align-items: flex-start;
+  margin: 5vh 0;
+}
+
+.rest {
+  display: flex;
+  flex-direction: column;
+  height: 55vh;
+  justify-content: space-between;
+  padding: 5vh;
+}
+
+.rest > h1 {
+  text-align: center;
+}
+
+.auth > form {
+  background-color: var(--nav-color);
+  padding: 5vh;
+  width: 30vw;
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  justify-content: center;
+  align-items: center;
+}
+
+.profileImg {
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid var(--text-color);
+  cursor: pointer;
+}
+
+input {
+  color: black;
+  width: 30vw;
+  border: none;
+  border-bottom: 1px solid var(--accent-color);
+  border-radius: 1%;
+  line-height: 30px;
+  margin: 10px 0px;
+}
+
+input:focus {
+  box-shadow:
+    1px 1px 3px var(--accent-color),
+    -1px -1px 5px var(--accent-color);
+  outline: none;
+}
+
+form button {
+  background-color: var(--body-color);
+  border: 2px solid var(--accent-color);
+  padding: 10px 30px;
+  margin: 10px;
+  border-radius: 100px;
+}
+
+form button:hover {
+  background-color: var(--accent-color);
+  color: var(--body-color);
+  box-shadow:
+    2px 2px 4px rgba(0, 0, 0, 0.2),
+    -2px -2px 3px var(--body-color);
+}
+
+@media (max-width: 768px) {
+  .auth {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 0;
+  }
+  .rest > img {
+    height: 50px;
+  }
+  .rest {
+    display: flex;
+    flex-direction: row;
+    height: auto;
+    justify-content: center;
+    align-items: center;
+    margin: 2vh 0px;
+    padding: 0;
+    gap: 2vh;
+  }
+  .auth > form {
+    width: 75vw;
+  }
+  input {
+    width: 75vw;
+  }
+}

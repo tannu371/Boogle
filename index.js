@@ -158,7 +158,9 @@ app.get("/saved", async (req, res) => {
 
 // get login page
 app.get("/logIn", (req, res) => {
-  res.render("logIn.ejs");
+  res.render("logIn.ejs", {
+    activePage:"login",
+  });
 });
 
 // get signup page
@@ -257,6 +259,7 @@ app.post("/register", upload.single("dp"), async (req, res) => {
     });
 
     res.render("logIn.ejs", {
+      activePage: "login",
       message: "📧 Check your email to verify your account",
     });
   } catch (err) {
@@ -288,6 +291,7 @@ app.get("/verify/:token", async (req, res) => {
 
   if (result.rowCount === 0) {
     return res.render("logIn.ejs", {
+      activePage: "login",
       message: "❌ Verification link expired or invalid",
     });
   }
@@ -302,6 +306,7 @@ app.get("/verify/:token", async (req, res) => {
   );
 
   res.render("logIn.ejs", {
+    activePage:"login",
     message: "✅ Email verified! You can now log in.",
   });
 });
@@ -318,6 +323,7 @@ app.post("/", async (req, res) => {
 
   if (result.rowCount === 0) {
     return res.render("logIn.ejs", {
+      activePage: "login",
       message: "❌ User not found",
     });
   }
@@ -326,6 +332,7 @@ app.post("/", async (req, res) => {
 
   if (!user.is_verified) {
     return res.render("logIn.ejs", {
+      activePage: "login",
       message: "📧 Please verify your email before logging in",
     });
   }
@@ -334,6 +341,7 @@ app.post("/", async (req, res) => {
 
   if (!match) {
     return res.render("logIn.ejs", {
+      activepage: "login",
       message: "❌ Incorrect password",
     });
   }

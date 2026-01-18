@@ -53,9 +53,9 @@ This project demonstrates **end-to-end web development**, including backend APIs
     Boogle/
     │
     ├── public/
-    │ ├── icons/
+    │ ├── css/
     │ ├── images/
-    │ ├── main.css
+    │ ├── icons/
     │ └── main.js
     │
     ├── views/

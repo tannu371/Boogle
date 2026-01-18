@@ -1,6 +1,5 @@
 <%- include("partials/header.ejs") %>
     <% if(locals.blog) { %>
-        <h2> Edit Blog</h2>
         <div class="post">
             <form action="/update/<%= blog.id %>" method="post" enctype="multipart/form-data">
                 <input id="title-input" type="text" name="title" value="<%= blog.blog_title %>"> <br>
@@ -10,11 +9,10 @@
                 <br>
                 <textarea name="description"> <%= blog.blog_description %>
                                                 </textarea> <br>
-                <input id="publish_btn" type="submit" value="PUBLISH!">
+                <input id="publish_btn" type="submit" value="PUBLISH !">
             </form>
         </div>
         <% } else { %>
-            <h2>Create Blog</h2>
             <div class="post">
                 <form action="/post" method="post" enctype="multipart/form-data">
                     <input id="title-input" type="text" name="title" placeholder="Title Goes Here!" required> <br>
@@ -24,7 +22,7 @@
                     <br>
                     <textarea name="description" id="text-area" required>Write your thoughts here...
                                                         </textarea> <br>
-                    <input id="publish_btn" type="submit" value="PUBLISH!">
+                    <input id="publish_btn" type="submit" value="PUBLISH !">
                 </form>
             </div>
 
