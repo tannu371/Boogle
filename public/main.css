@@ -7,6 +7,16 @@ body {
   margin: 0;
 }
 
+.page-wrapper {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+main {
+  flex: 1; /* pushes footer to bottom */
+}
+
 button {
   background: none;
   border: #c1d6f7;
@@ -264,3 +274,4 @@ footer {
   position: sticky;
   bottom: 0;
 }
+
