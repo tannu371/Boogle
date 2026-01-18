@@ -37,24 +37,24 @@
                     <h1><a href="/"> Boogle </a></h1>
                 </div>
 
-                <a href="/create" id="create-link"> <button> Create Blog </button> </a>
-                <a href="/saved" id="save-link"> <button> Saved Blog </button> </a>
+                <a href="/create" id="create-link" class="nav-btn <%= activePage === 'create' ? 'active' : '' %>"> <button> Create Blog </button> </a>
+                <a href="/saved" id="save-link" class="nav-btn <%= activePage === 'saved' ? 'active' : '' %>"> <button> Saved Blog </button> </a>
 
                 <% if(locals.user) { %>
                     <form action="/update-profile" method="POST" enctype="multipart/form-data">
-                        <label for="profile"> <img id="profileImg" src="/image/<%= user.image_id %>" height="70px">
+                        <label for="profile"> <img class="profileImg" src="/image/<%= user.image_id %>" height="70px">
                         </label>
                         <input id="profile" type="file" name="profile" accept="image/*" style="display: none;"
                             onchange="this.form.submit();">
                     </form>
 
-                    <a href="/myPosts" id="username"> <button>
+                    <a href="/myPosts" id="username" class="nav-btn <%= activePage === 'myposts' ? 'active' : '' %>"> <button>
                             <%= user.user_name %>
                         </button> </a>
 
                     <a href="/logout"> <button> LogOut </button> </a>
                     <% } else { %>
-                        <a href="/logIn"> <button> LogIn </button> </a>
+                        <a href="/logIn" class="login"> <button> LogIn </button> </a>
                         <% } %>
 
             </div>

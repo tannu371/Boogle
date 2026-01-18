@@ -1,5 +1,6 @@
 body {
   background-color: #e8f9ff;
+  color:#112d42
 }
 
 * {
@@ -11,6 +12,13 @@ body {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+}
+
+.profileImg {
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid rgb(17, 45, 66);
+  cursor: pointer;
 }
 
 main {
@@ -49,7 +57,7 @@ p {
   align-items: center;
   justify-content: end;
   padding: 0px 20px;
-  box-shadow: 2px 2px 2px rgb(17, 45, 66);
+  box-shadow: 2px 2px 2px  rgb(17, 45, 66);
   background-color: white;
 }
 
@@ -150,6 +158,18 @@ a:visited {
 
 a:hover {
   text-shadow: 0.5px 0.5px rgb(17, 45, 66);
+}
+
+.nav-btn.active > button {
+  background:  rgb(17, 45, 66);
+  color: white;
+  font-weight: 600;
+}
+
+a.login > button {
+  background-color: #c1d6f7;;
+  border: 5px solid rgb(17, 45, 66);
+  border-radius: 500px;
 }
 
 h2 {
@@ -274,4 +294,73 @@ footer {
   position: sticky;
   bottom: 0;
 }
+
+
+/* =========================
+   Responsive (Mobile)
+========================= */
+
+@media (max-width: 768px) {
+
+  /* Header / Navbar */
+  .nav-links {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+    padding: 10px;
+  }
+
+  #logo {
+    justify-content: center;
+    margin: 0 auto;
+  }
+
+  /* Auth pages */
+  .auth {
+    flex-direction: column;
+    margin: 20px;
+  }
+
+  .auth > * {
+    width: 100%;
+    height: auto;
+  }
+
+  .left > img {
+    margin: 20px auto;
+    display: block;
+  }
+
+  /* Blog cards */
+  .blog-card {
+    margin: 0 5%;
+  }
+
+  .blog-card img {
+    float: none;
+    display: block;
+    margin: 10px auto;
+    width: 100%;
+    max-width: 300px;
+  }
+
+  /* Post / Edit page */
+  #title-input,
+  textarea {
+    width: 90vw;
+  }
+
+  /* Blog view */
+  .blog-view {
+    margin: 0 5%;
+  }
+
+  /* Buttons alignment */
+  .btn {
+    position: static;
+    justify-content: center;
+    margin: 10px 0;
+  }
+}
+
 

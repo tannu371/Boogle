@@ -4,6 +4,17 @@ import multer from "multer"; // middleware to handle file uploads
 import fs from "fs"; // read file data
 import pg from "pg";
 import "dotenv/config";
+import bcrypt from "bcrypt";
+import { v4 as uuidv4 } from "uuid";
+import nodemailer from "nodemailer";
+
+const transporter = nodemailer.createTransport({
+  service: "gmail",
+  auth: {
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS,
+  },
+});
 
 const SQLiteStore = (await import("connect-sqlite3")).default(session);
 const upload = multer({ dest: "uploads/" }); // Temp folder
@@ -16,7 +27,6 @@ app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
 
-
 const db = new pg.Client({
   connectionString: process.env.DATABASE_URL,
   ssl:
@@ -27,6 +37,12 @@ const db = new pg.Client({
 db.connect();
 
 export default db;
+
+// activePage is always defined, Individual routes can override it
+app.use((req, res, next) => {
+  res.locals.activePage = "";
+  next();
+});
 
 app.use(express.static("public"));
 app.use(express.urlencoded({ extended: true }));
@@ -50,7 +66,7 @@ app.use(
 async function getSaved(username) {
   const result = await db.query(
     "SELECT blog_id FROM saved_blog WHERE user_name = $1;",
-    [username]
+    [username],
   );
   let saved = [];
   result.rows.forEach((entry) => {
@@ -63,20 +79,24 @@ async function getSaved(username) {
 app.get("/", async (req, res) => {
   try {
     const result = await db.query(
-      "SELECT * from blogs ORDER BY post_time DESC"
+      "SELECT * from blogs ORDER BY post_time DESC",
     );
     if (req.session.user) {
       const username = req.session.user.user_name;
       const saved = await getSaved(username);
-  
+
       res.render("index.ejs", {
-        pageType: "home",
+        activePage: "home",
         user: req.session.user,
         blogs: result.rows,
         saved: saved,
       });
     } else {
-      res.render("index.ejs", { blogs: result.rows, saved:[] });
+      res.render("index.ejs", {
+        activePage: "home",
+        blogs: result.rows,
+        saved: [],
+      });
     }
   } catch (err) {
     console.log(err);
@@ -93,9 +113,9 @@ app.get("/blog/:id", async (req, res) => {
     const blog = result.rows[0];
 
     if (req.session.user) {
-      res.render("blogView", { user: req.session.user, blog: blog });
+      res.render("blogView.ejs", { activePage: "blog",user: req.session.user, blog: blog });
     } else {
-      res.render("blogView.ejs", { blog: blog });
+      res.render("blogView.ejs", { activePage: "blog", blog: blog });
     }
   } catch (err) {
     console.log(err);
@@ -108,7 +128,10 @@ app.get("/create", (req, res) => {
   if (!req.session.user) {
     return res.redirect("/logIn"); // Redirect if not logged in
   }
-  res.render("modify.ejs", { user: req.session.user });
+  res.render("modify.ejs", {
+    activePage: "create",
+    user: req.session.user,
+  });
 });
 
 // get all saved blogs
@@ -120,17 +143,17 @@ app.get("/saved", async (req, res) => {
   const username = req.session.user.user_name;
   const result = await db.query(
     "SELECT * FROM blogs b JOIN saved_blog sb ON sb.blog_id = b.id WHERE sb.user_name = $1 ORDER BY b.post_time DESC;",
-    [username]
+    [username],
   );
 
-   const saved = await getSaved(username);
+  const saved = await getSaved(username);
 
-   res.render("index.ejs", {
-     pageType: "saved",
-     user: req.session.user,
-     blogs: result.rows,
-     saved: saved,
-   });
+  res.render("index.ejs", {
+    activePage: "saved",
+    user: req.session.user,
+    blogs: result.rows,
+    saved: saved,
+  });
 });
 
 // get login page
@@ -148,10 +171,20 @@ app.post("/register", upload.single("dp"), async (req, res) => {
   try {
     if (!req.file) {
       return res.render("signUp.ejs", {
-        error: "❌ Profile picture is required",
+        message: "❌ Profile picture is required",
       });
     }
 
+    const { username, email, password } = req.body;
+
+    // hash password
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // verification token + expiry (24 hours)
+    const token = uuidv4();
+    const expires = new Date(Date.now() + 24 * 60 * 60 * 1000);
+
+    // save image
     const { originalname, mimetype, path } = req.file;
     const fileData = fs.readFileSync(path);
 
@@ -165,58 +198,152 @@ app.post("/register", upload.single("dp"), async (req, res) => {
     );
 
     fs.unlinkSync(path);
-
     const imageId = imageResult.rows[0].id;
-    const { username, email, password } = req.body;
 
+    // insert user (UNVERIFIED)
     await db.query(
-      "INSERT INTO users (user_name, email, password, image_id) VALUES ($1, $2, $3, $4)",
-      [username, email, password, imageId],
+      `INSERT INTO users (
+        user_name,
+        email,
+        password,
+        image_id,
+        is_verified,
+        verification_token,
+        verification_expires
+      )
+      VALUES ($1, $2, $3, $4, false, $5, $6)`,
+      [username, email, hashedPassword, imageId, token, expires],
     );
 
-    res.redirect("/login");
+    // send verification email
+    const verifyLink = `${process.env.BASE_URL}/verify/${token}`;
+
+    await transporter.sendMail({
+      from: `"Bloogle" <${process.env.EMAIL_USER}>`,
+      to: email,
+      subject: "Verify your Bloogle account",
+      html: `
+    <p>Dear <strong>${username}</strong>,</p>
+
+    <p>Welcome to <strong>Bloogle ✨</strong></p>
+
+    <p>
+      Thank you for signing up. Please verify your email address by clicking the link below:
+    </p>
+
+    <p style="margin:16px 0;">
+      <a href="${verifyLink}"
+         style="padding:10px 16px;
+                background:#112d42;
+                color:#ffffff;
+                text-decoration:none;
+                border-radius:6px;">
+        Verify Email
+      </a>
+    </p>
+
+    <p>
+      ⏳ <strong>This link is valid for 24 hours.</strong><br>
+      If you do not verify within this time, you’ll need to sign up again.
+    </p>
+
+    <p>
+      If you did not create this account, you can safely ignore this email.
+    </p>
+
+    <br>
+    <p>Regards,<br><strong>Team Bloogle</strong></p>
+  `,
+    });
+
+    res.render("logIn.ejs", {
+      message: "📧 Check your email to verify your account",
+    });
   } catch (err) {
     console.error("Register error:", err);
 
     if (err.code === "23505") {
       return res.render("signUp.ejs", {
-        error: "❌ Username already exists",
+        message: "❌ Username already exists",
       });
     }
 
     res.render("signUp.ejs", {
-      error: "❌ Registration failed. Please try again.",
+      message: "❌ Registration failed",
     });
   }
 });
 
 
-// login and redirect to /
-app.post("/", async (req, res) => {
-  try {
-    const { username, password } = req.body;
-    const result = await db.query("SELECT * from users WHERE user_name = $1;", [
-      username,
-    ]);
+// verify
+app.get("/verify/:token", async (req, res) => {
+  const { token } = req.params;
 
-    if (result.rowCount > 0) {
-      const user = result.rows[0];
-      if (user.password === password) {
-        req.session.user = user;
-        res.redirect("/");
-      } else {
-        res.render("logIn", { message: "Passwords Incorrect!" });
-      }
-    } else {
-      res.render("logIn", { message: "Username doesn't exist" });
-    }
-  } catch (err) {
-    console.log(err);
-    res.redirect("/");
+  const result = await db.query(
+    `SELECT * FROM users
+     WHERE verification_token = $1
+       AND verification_expires > NOW()`,
+    [token],
+  );
+
+  if (result.rowCount === 0) {
+    return res.render("logIn.ejs", {
+      message: "❌ Verification link expired or invalid",
+    });
   }
+
+  await db.query(
+    `UPDATE users
+     SET is_verified = true,
+         verification_token = NULL,
+         verification_expires = NULL
+     WHERE verification_token = $1`,
+    [token],
+  );
+
+  res.render("logIn.ejs", {
+    message: "✅ Email verified! You can now log in.",
+  });
 });
 
-// update profile 
+
+
+// login and redirect to /
+app.post("/", async (req, res) => {
+  const { username, password } = req.body;
+
+  const result = await db.query("SELECT * FROM users WHERE user_name = $1", [
+    username,
+  ]);
+
+  if (result.rowCount === 0) {
+    return res.render("logIn.ejs", {
+      message: "❌ User not found",
+    });
+  }
+
+  const user = result.rows[0];
+
+  if (!user.is_verified) {
+    return res.render("logIn.ejs", {
+      message: "📧 Please verify your email before logging in",
+    });
+  }
+
+  const match = await bcrypt.compare(password, user.password);
+
+  if (!match) {
+    return res.render("logIn.ejs", {
+      message: "❌ Incorrect password",
+    });
+  }
+
+  req.session.user = user;
+  res.redirect("/");
+});
+
+
+// update profile
 app.post("/update-profile", upload.single("profile"), async (req, res) => {
   const { originalname, mimetype, path } = req.file;
   const fileData = fs.readFileSync(path);
@@ -226,7 +353,7 @@ app.post("/update-profile", upload.single("profile"), async (req, res) => {
     // Insert into `images` table
     const imageResult = await db.query(
       "INSERT INTO images (name, mimetype, data) VALUES ($1, $2, $3) ON CONFLICT(data_hash) DO UPDATE SET name = EXCLUDED.name RETURNING id",
-      [originalname, mimetype, fileData]
+      [originalname, mimetype, fileData],
     );
 
     fs.unlinkSync(path); // remove temp file
@@ -234,10 +361,10 @@ app.post("/update-profile", upload.single("profile"), async (req, res) => {
     const imageId = imageResult.rows[0].id;
 
     // Update user profile with image reference
-    const updatedUser = await db.query("UPDATE users SET image_id = $1 WHERE id = $2 RETURNING *;", [
-      imageId,
-      userId,
-    ]);
+    const updatedUser = await db.query(
+      "UPDATE users SET image_id = $1 WHERE id = $2 RETURNING *;",
+      [imageId, userId],
+    );
 
     req.session.user = updatedUser.rows[0];
 
@@ -274,7 +401,11 @@ app.get("/edit/:id", async (req, res) => {
   try {
     const result = await db.query("SELECT * from blogs WHERE id = $1;", [id]);
     const blog = result.rows[0];
-    res.render("modify.ejs", { blog: blog, user: req.session.user });
+    res.render("modify.ejs", {
+      activePage: "create",
+      blog: blog,
+      user: req.session.user,
+    });
   } catch (err) {
     console.log(err);
     res.redirect("/");
@@ -293,14 +424,14 @@ app.post("/post", upload.single("image"), async (req, res) => {
   try {
     const result = await db.query(
       "INSERT INTO images(name, data, mimetype) values ($1, $2, $3) ON CONFLICT(data_hash) DO UPDATE SET name = EXCLUDED.name RETURNING id;",
-      [originalname, fileData, mimetype]
+      [originalname, fileData, mimetype],
     );
 
     const image_id = result.rows[0].id;
 
     await db.query(
       "INSERT INTO blogs (blog_writer, blog_title, blog_description, image_id) VALUES ($1, $2, $3, $4)",
-      [writer, title, description, image_id]
+      [writer, title, description, image_id],
     );
     fs.unlinkSync(path); // remove temp file
     res.redirect("/");
@@ -359,27 +490,26 @@ app.post("/update/:id", upload.single("image"), async (req, res) => {
   }
 });
 
-
 // get user created blogs
 app.get("/myPosts", async (req, res) => {
   try {
     const username = req.session.user.user_name;
     const result = await db.query(
       "SELECT * FROM blogs WHERE blog_writer = $1;",
-      [username]
+      [username],
     );
 
     const saved = await getSaved(username);
 
     res.render("index.ejs", {
-      pageType: "myPost",
+      activePage: "myposts",
       user: req.session.user,
       blogs: result.rows,
-      saved : saved,
+      saved: saved,
     });
   } catch (err) {
     console.log(err);
-    res.redirect('/');
+    res.redirect("/");
   }
 });
 
@@ -398,18 +528,18 @@ app.post("/save", async (req, res) => {
 
   const result = await db.query(
     "SELECT * FROM saved_blog WHERE blog_id = $1 AND user_name = $2;",
-    [blogId, username]
+    [blogId, username],
   );
 
   if (result.rowCount > 0) {
     await db.query(
       "DELETE FROM saved_blog WHERE blog_id = $1 AND user_name = $2;",
-      [blogId, username]
+      [blogId, username],
     );
   } else {
     await db.query(
       "INSERT INTO saved_blog(blog_id, user_name) VALUES ($1, $2);",
-      [blogId, username]
+      [blogId, username],
     );
   }
 
