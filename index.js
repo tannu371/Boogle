@@ -30,6 +30,9 @@ export default db;
 
 app.use(express.static("public"));
 app.use(express.urlencoded({ extended: true }));
+
+app.set("trust proxy", 1);
+
 app.use(
   session({
     store: new SQLiteStore(),
@@ -39,9 +42,11 @@ app.use(
     cookie: {
       maxAge: 360000,
       secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
     },
   }),
 );
+
 
 
 async function getSaved(username) {
@@ -196,10 +201,10 @@ app.post("/", async (req, res) => {
         req.session.user = user;
         res.redirect("/");
       } else {
-        res.render("logIn.ejs", { message: "Passwords Incorrect!" });
+        res.render("logIn", { message: "Passwords Incorrect!" });
       }
     } else {
-      res.render("logIn.ejs", { message: "Username doesn't exist" });
+      res.render("logIn", { message: "Username doesn't exist" });
     }
   } catch (err) {
     console.log(err);
