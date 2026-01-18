@@ -167,25 +167,27 @@ CREATE TABLE saved_blog (
     http://localhost:3000
 
 ## 🌍 Deployment Notes (Render)
-Create a PostgreSQL service on Render
+1. Create a PostgreSQL service on Render
+2. Copy the Internal Database URL
+3. Create App Password and Copy
 
-Copy the Internal Database URL
+    https://myaccount.google.com/apppasswords
+4. Create Web Service Project
+5. Add required environment variables:
 
-Add required environment variables:
+    DATABASE_URL = Paste_your_Render_DATABASE_URL
 
-    DATABASE_URL
+    SESSION_SECRET = some-long-random-string
 
-    SESSION_SECRET
+    EMAIL_USER = yourgmail@gmail.com
 
-    EMAIL_USER
-
-    EMAIL_PASS
+    EMAIL_PASS = Paste_your_app_password
 
     BASE_URL=https://your-app.onrender.com
 
     NODE_ENV=production
 
-    Redeploy after updating environment variables
+6. Redeploy after updating environment variables
 
 ---
 
