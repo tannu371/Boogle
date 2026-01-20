@@ -1,7 +1,9 @@
 import passport from "passport";
 import { Strategy } from "passport-local";
 import bcrypt from "bcrypt";
+import { v4 as uuidv4 } from "uuid";
 import db from "./db.js"; // Note the path to your db config
+import transporter from "./mailer.js";
 
 passport.use(
   "local",
@@ -19,10 +21,32 @@ passport.use(
 
       const user = result.rows[0];
 
-      // 2. Block if not verified (Email Verification check)
+      // 2. Email Verification check 
       if (!user.is_verified) {
+        // 1. Generate a NEW token and expiry
+        const newToken = uuidv4();
+        const newExpires = new Date(Date.now() + 24 * 60 * 60 * 1000);
+
+        // 2. Update the user in the background
+        await db.query(
+          "UPDATE users SET verification_token = $1, verification_expires = $2 WHERE user_name = $3",
+          [newToken, newExpires, username],
+        );
+
+        // 3. Send the email (Don't 'await' here so login response stays fast)
+        const verifyLink = `${process.env.BASE_URL}/verify/${newToken}`;
+        transporter
+          .sendMail({
+            from: `"Boogle" <${process.env.EMAIL_USER}>`,
+            to: user.email,
+            subject: "Resent: Verify your Boogle account",
+            html: `<p>You tried to log in, but your account isn't verified. <a href="${verifyLink}">Click here to verify.</a></p>`,
+          })
+          .catch((err) => console.error("Resend email failed:", err));
+
         return cb(null, false, {
-          message: "📧 Please verify your email first",
+          message:
+            "📧 Account not verified. A new link has been sent to your email.",
         });
       }
 
@@ -49,6 +73,29 @@ passport.use(
     }
   }),
 );
+
+// Remember to include your serialize/deserialize functions below this!
+
+// 1. Store ONLY the ID in the session cookie
+passport.serializeUser((user, cb) => {
+  cb(null, user.id);
+});
+
+// 2. Use that ID to fetch the LATEST data from the DB
+passport.deserializeUser(async (id, cb) => {
+  try {
+    const result = await db.query("SELECT * FROM users WHERE id = $1", [id]);
+
+    if (result.rows.length > 0) {
+      cb(null, result.rows[0]); // req.user is now the full user object
+    } else {
+      cb(new Error("User not found during deserialization"));
+    }
+  } catch (err) {
+    cb(err);
+  }
+});
+
 
 // passport.use(
 //   "google",
@@ -79,27 +126,5 @@ passport.use(
 //     },
 //   ),
 // );
-
-// Remember to include your serialize/deserialize functions below this!
-
-// 1. Store ONLY the ID in the session cookie
-passport.serializeUser((user, cb) => {
-  cb(null, user.id);
-});
-
-// 2. Use that ID to fetch the LATEST data from the DB
-passport.deserializeUser(async (id, cb) => {
-  try {
-    const result = await db.query("SELECT * FROM users WHERE id = $1", [id]);
-
-    if (result.rows.length > 0) {
-      cb(null, result.rows[0]); // req.user is now the full user object
-    } else {
-      cb(new Error("User not found during deserialization"));
-    }
-  } catch (err) {
-    cb(err);
-  }
-});
 
 export default passport;
