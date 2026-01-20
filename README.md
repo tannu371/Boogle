@@ -52,11 +52,17 @@ This project demonstrates **end-to-end web development**, including backend APIs
 
     Boogle/
     │
+    ├── config/
+    │
+    ├── middleware/
+    │
     ├── public/
     │ ├── css/
     │ ├── images/
     │ ├── icons/
     │ └── main.js
+    │
+    ├── routes/
     │
     ├── views/
     │ ├── partials/

@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
-    "dev": "nodemon index.js"
+    "dev": "nodemon index.js",
+    "dev2": "nodemon app.js"
   },
   "keywords": [],
   "author": "",
@@ -14,6 +15,8 @@
   "dependencies": {
     "bcrypt": "^6.0.0",
     "body-parser": "^2.2.0",
+    "connect-pg-simple": "^10.0.0",
+    "connect-sqlite3": "^0.9.16",
     "dotenv": "^17.2.3",
     "ejs": "^3.1.10",
     "express": "^5.1.0",

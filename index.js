@@ -1,10 +1,11 @@
 import express from "express";
 import session from "express-session";
+import pgSession from "connect-pg-simple";
 import passport from "passport";
 import env from "dotenv";
 
 // 1. Import Configs
-import "./config/db.js"; // Starts DB connection
+import db from "./config/db.js"; // Starts DB connection
 import "./config/passport.js"; // Sets up strategies
 
 // 2. Import Routes
@@ -14,6 +15,7 @@ import imageRoutes from "./routes/imageRoutes.js";
 
 env.config();
 const app = express();
+const PostgresStore = pgSession(session);
 
 // 3. Global Middleware
 app.use(express.static("public"));
@@ -22,10 +24,20 @@ app.use(express.urlencoded({ extended: true }));
 // 4. Session & Passport Init
 app.use(
   session({
+    store: new PostgresStore({
+      pool: db, // Connection pool
+      tableName: "session", // The table you just created
+      // This tells the store to delete expired sessions every 600 seconds (10 minutes)
+      pruneSessionInterval: 600,
+    }),
     secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: true,
-    cookie: { maxAge: 1000 * 60 * 60 * 24 },
+    cookie: {
+      maxAge: 1000 * 60 * 60 * 24, // 1 day session persistence
+      secure: false, // Set to true if you're using HTTPS
+      httpOnly: true, // Protects against XSS
+    },
   }),
 );
 

@@ -31,3 +31,11 @@ CREATE TABLE saved_blog (
   user_name TEXT,
   UNIQUE (blog_id, user_name)
 );
+
+// To Store sessions
+CREATE TABLE "session" (
+  "sid" varchar NOT NULL COLLATE "default",
+  "sess" json NOT NULL,
+  "expire" timestamp(6) NOT NULL
+) WITH (OIDS=FALSE);
+ALTER TABLE "session" ADD CONSTRAINT "session_pkey" PRIMARY KEY ("sid") NOT DEFERRABLE INITIALLY IMMEDIATE;
