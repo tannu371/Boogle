@@ -8,6 +8,9 @@
 
 .blog-card img {
   width: 30vw;
+  height: 25vh;
+  object-fit: cover;
+  object-position: center;
   margin: 2vw;
   flex-shrink: 0; /* Prevents the image from squishing */
 }
@@ -32,8 +35,7 @@
 .btn {
   margin-top: auto;
   display: flex;
-  justify-content: flex-end;
-  gap: 2vw;
+  justify-content: space-between;
 }
 
 .time {
@@ -57,6 +59,12 @@
 @media (max-width: 768px) {
   .blog-card {
     margin: 2vh;
+  }
+
+  .blog-card img {
+    height: 11vh;
+    object-fit: cover;
+    object-position: center;
   }
 
   .clamp {

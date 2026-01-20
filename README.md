@@ -76,14 +76,56 @@ This project demonstrates **end-to-end web development**, including backend APIs
 
 ---
 
+## 🗄️ Database Schema
+
+```
+            ┌──────────────┐
+            │   images     │
+            │──────────────│
+            │ id (PK)      │◄──────────────┐
+            │ name         │               │
+            │ data         │               │
+            │ mimetype     │               │
+            │ data_hash    │               │
+            └──────────────┘               │
+                   ▲                       │
+                   │                       │
+         image_id  │                       │ image_id
+                   │                       │
+            ┌──────────────┐        ┌──────────────┐
+            │    users     │        │    blogs     │
+            │──────────────│        │──────────────│
+            │ id (PK)      │        │ id (PK)      │
+            │ user_name    │◄───────┤ blog_writer  │
+            │ email        │        │ blog_title   │
+            │ password     │        │ description  │
+            │ image_id (FK)│        │ image_id(FK) │
+            │ is_verified  │        │ post_time    │
+            │ token        │        └──────────────┘
+            │ expires      │
+            └──────────────┘
+                   ▲
+                   │ user_name
+                   │
+            ┌──────────────┐
+            │  saved_blog  │
+            │──────────────│
+            │ blog_id (FK) │──────► blogs.id
+            │ user_name    │──────► users.user_name
+            │ UNIQUE(...)  │
+            └──────────────┘
+```
+
+---
+
 ## ⚙️ Environment Variables
 
 Create a `.env` file in the root directory:
 
     PORT=3000
-    DATABASE_URL=your_postgresql_connection_string
+    DATABASE_URL=postgresql://postgres:YOUR_PASSWORD@localhost:5432/YOUR_DB_NAME # or YOUR_postgresql_external_database_url
     SESSION_SECRET=your_session_secret
-    NODE_ENV=development
+    NODE_ENV=development # or production (if using render database)
 
     EMAIL_USER=your_email@gmail.com
 
@@ -92,46 +134,6 @@ Create a `.env` file in the root directory:
 
 
 > ⚠️ For Gmail, use a **Google App Password**, not your actual Gmail password.
-
----
-
-## 🗄️ Database Schema
-
-```sql
-CREATE TABLE images (
-  id SERIAL PRIMARY KEY,
-  name TEXT,
-  data BYTEA,
-  mimetype TEXT,
-  data_hash TEXT UNIQUE
-);
-
-CREATE TABLE users (
-  id SERIAL PRIMARY KEY,
-  user_name TEXT UNIQUE,
-  email TEXT,
-  password TEXT,
-  image_id INTEGER REFERENCES images(id),
-  is_verified BOOLEAN DEFAULT false,
-  verification_token TEXT,
-  verification_expires TIMESTAMP
-);
-
-CREATE TABLE blogs (
-  id SERIAL PRIMARY KEY,
-  post_time TIMESTAMP DEFAULT now(),
-  blog_writer TEXT REFERENCES users(user_name),
-  blog_title TEXT,
-  blog_description TEXT,
-  image_id INTEGER REFERENCES images(id)
-);
-
-CREATE TABLE saved_blog (
-  blog_id INTEGER REFERENCES blogs(id) ON DELETE CASCADE,
-  user_name TEXT,
-  UNIQUE (blog_id, user_name)
-);
-```
 
 ---
 
@@ -165,6 +167,8 @@ CREATE TABLE saved_blog (
 
 ### 5️⃣ Open in browser
     http://localhost:3000
+
+---
 
 ## 🌍 Deployment Notes (Render)
 1. Create a PostgreSQL service on Render
@@ -208,3 +212,8 @@ CREATE TABLE saved_blog (
 - Rich text editor
 - AJAX save / unsave
 - Role-based access control
+
+
+<!-- To Do
+Image ka fix height karna h home(index.js) pe
+profile page banana h taki user name aur photo change kar sake waha se, profile ko left/bottom me karna h -->

@@ -7,7 +7,7 @@
         </div>
 
 
-        <form action="/" method="POST">
+        <form action="/login" method="POST">
 
             <div class="hi">
                 <label for="username">Username</label> <br />
@@ -20,7 +20,7 @@
             </div>
 
             <p id="message" style="color:red">
-                <% if(locals.message) { %>
+                <% if(message) { %>
                     <%= message %>
                         <% } %>
             </p> <br />
@@ -29,7 +29,7 @@
                 <button>LogIn</button>
             </div>
 
-            <a href="/signUp">Don't have an account?</a>
+            <a href="/register">Don't have an account?</a>
         </form>
     </div>
 

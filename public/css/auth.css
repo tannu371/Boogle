@@ -27,9 +27,11 @@
   gap: 2px;
   justify-content: center;
   align-items: center;
+  align-self: center;
 }
 
 .profileImg {
+  width: 50px;
   border-radius: 50%;
   object-fit: cover;
   border: 3px solid var(--text-color);
@@ -94,5 +96,9 @@ form button:hover {
   }
   input {
     width: 75vw;
+  }
+
+  .message {
+    font-size: 0.6rem;
   }
 }

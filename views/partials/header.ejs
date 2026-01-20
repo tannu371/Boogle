@@ -64,26 +64,29 @@
                                 class="nav-btn <%= activePage === 'saved' ? 'active' : '' %>"> Saved Blog
                             </a>
 
-                            <% if(locals.user) { %>
-                                <form class="hide-in-mobile" action="/update-profile" method="POST" enctype="multipart/form-data">
-                                    <label for="profile"> <img class="profileImg" src="/image/<%= user.image_id %>"
-                                            height="70px">
+                            <% if(user) { %>
+                                <form class="hide-in-mobile" action="/update-profile" method="POST"
+                                    enctype="multipart/form-data">
+                                    <label for="profile">
+                                        <% if(user && user.image_id) {%>
+                                            <img class="profileImg" src="/image/<%= user.image_id %>">
+                                            <% } else { %>
+                                                <img class="profileImg" src="/images/user.png">
+                                                <% } %>
                                     </label>
                                     <input id="profile" type="file" name="profile" accept="image/*"
                                         style="display: none;" onchange="this.form.submit();">
                                 </form>
 
-                                <a href="/myPosts" id="username"
+                                <a href="/myposts" id="username"
                                     class="nav-btn <%= activePage === 'myposts' ? 'active' : '' %>">
-                                        <span class="hide-in-mobile">
-                                            <%= user.user_name %>
-                                        </span>
-                                        <span class="hide-in-desktop">My Posts</span>
-                                    </a>
+                                    MyPosts
+                                </a>
 
                                 <a href="/logout">LogOut</a>
                                 <% } else { %>
-                                    <a href="/logIn" class="nav-btn <%= activePage === 'login' ? 'active' : '' %>">LogIn </a>
+                                    <a href="/login" class="nav-btn <%= activePage === 'login' ? 'active' : '' %>">LogIn
+                                    </a>
                                     <% } %>
                     </nav>
                 </div>

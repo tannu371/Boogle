@@ -3,107 +3,116 @@
 
         <% if(blogs.length> 0) { %>
             <% for (var i=0; i<blogs.length; i++) { %>
-                <div class="blog-card">
-                    <a href="/blog/<%= blogs[i].id %>">
-                        <img src=/image/<%=blogs[i].image_id %> alt="blog image">
-                    </a>
 
-                    <div class="content">
-                        <div class="content-header">
-                            <h3>
-                                <a href="/blog/<%= blogs[i].id %>">
-                                    <%= blogs[i].blog_title %>
-                                </a>
-                            </h3>
-                            <% if(!locals.user) { %>
-                                <form class="save-btn" action="/save" method="post">
-                                    <label for="save-<%= blogs[i].id %>" onclick="generateMsg(event, 1)">
-                                        <svg width="20px" height="20px" viewBox="0 0 24 24" fill="none"
-                                            xmlns="http://www.w3.org/2000/svg">
-                                            <path
-                                                d="M21.9998 5.11V16.47C21.9998 17.92 20.9598 18.53 19.6898 17.83L17.7598 16.75C17.5998 16.66 17.4998 16.49 17.4998 16.31V8.99C17.4998 6.45 15.4298 4.38 12.8898 4.38H8.81984C8.44984 4.38 8.18984 3.99 8.35984 3.67C8.87984 2.68 9.91984 2 11.1098 2H18.8898C20.5998 2 21.9998 3.4 21.9998 5.11Z"
-                                                fill="lightgrey" />
-                                            <path
-                                                d="M12.89 5.87891H5.11C3.4 5.87891 2 7.27891 2 8.98891V20.3489C2 21.7989 3.04 22.4089 4.31 21.7089L8.24 19.5189C8.66 19.2889 9.34 19.2889 9.76 19.5189L13.69 21.7089C14.96 22.4089 16 21.7989 16 20.3489V8.98891C16 7.27891 14.6 5.87891 12.89 5.87891ZM11 12.7489H9.75V13.9989C9.75 14.4089 9.41 14.7489 9 14.7489C8.59 14.7489 8.25 14.4089 8.25 13.9989V12.7489H7C6.59 12.7489 6.25 12.4089 6.25 11.9989C6.25 11.5889 6.59 11.2489 7 11.2489H8.25V9.99891C8.25 9.58891 8.59 9.24891 9 9.24891C9.41 9.24891 9.75 9.58891 9.75 9.99891V11.2489H11C11.41 11.2489 11.75 11.5889 11.75 11.9989C11.75 12.4089 11.41 12.7489 11 12.7489Z"
-                                                fill="lightgrey" />
-                                        </svg>
-                                    </label>
-                                    <input type="submit" id="save-<%= blogs[i].id %>" name="id"
-                                        value="<%= blogs[i].id %>" style="display:none;">
-                                </form>
-                                <% } else { %>
-                                    <form class="save-btn" action="/save" method="post">
-                                        <label for="save-<%= blogs[i].id %>">
-                                            <svg id="save-svg-<%= blogs[i].id %>" width="20px" height="20px"
-                                                viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                                <path
-                                                    d="M21.9998 5.11V16.47C21.9998 17.92 20.9598 18.53 19.6898 17.83L17.7598 16.75C17.5998 16.66 17.4998 16.49 17.4998 16.31V8.99C17.4998 6.45 15.4298 4.38 12.8898 4.38H8.81984C8.44984 4.38 8.18984 3.99 8.35984 3.67C8.87984 2.68 9.91984 2 11.1098 2H18.8898C20.5998 2 21.9998 3.4 21.9998 5.11Z"
-                                                    fill="lightblue" />
-                                                <path
-                                                    d="M12.89 5.87891H5.11C3.4 5.87891 2 7.27891 2 8.98891V20.3489C2 21.7989 3.04 22.4089 4.31 21.7089L8.24 19.5189C8.66 19.2889 9.34 19.2889 9.76 19.5189L13.69 21.7089C14.96 22.4089 16 21.7989 16 20.3489V8.98891C16 7.27891 14.6 5.87891 12.89 5.87891ZM11 12.7489H9.75V13.9989C9.75 14.4089 9.41 14.7489 9 14.7489C8.59 14.7489 8.25 14.4089 8.25 13.9989V12.7489H7C6.59 12.7489 6.25 12.4089 6.25 11.9989C6.25 11.5889 6.59 11.2489 7 11.2489H8.25V9.99891C8.25 9.58891 8.59 9.24891 9 9.24891C9.41 9.24891 9.75 9.58891 9.75 9.99891V11.2489H11C11.41 11.2489 11.75 11.5889 11.75 11.9989C11.75 12.4089 11.41 12.7489 11 12.7489Z"
-                                                    fill="lightblue" />
-                                            </svg>
-                                        </label>
-                                        <input type="submit" id="save-<%= blogs[i].id %>" name="id"
-                                            value="<%= blogs[i].id %>" style="display:none;">
-                                    </form>
-                                    <%} %>
-                        </div>
-                        <p class="time">
-                            <%= blogs[i].post_time %>
-                        </p>
-                        <p class="clamp">
-                            <%= blogs[i].blog_description %>
-                        </p>
-                        <% if(locals.user && locals.user.user_name==blogs[i].blog_writer) { %>
-                            <div class="btn">
-                                <a href="/edit/<%= blogs[i].id %>">
-                                    <svg width="20px" height="20px" viewBox="0 -0.5 21 21" version="1.1"
-                                        xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+                <a href="/blog/<%= blogs[i].id %>">
+                    <div class="blog-card">
+                        <% if(blogs[i].image_id !=null) { %>
+                            <img src=/image/<%=blogs[i].image_id %> alt="blog image">
+                            <% } else { %>
+                                <img src="/images/photo.png" alt="blog image">
+                                <% } %>
+                                    <div class="content">
+                                        <div class="content-header">
+                                            <h3>
+                                                <%= blogs[i].blog_title %>
+                                            </h3>
+                                            <% if(!user) { %>
+                                                <form class="save-btn" action="/save" method="post">
+                                                    <label for="save-<%= blogs[i].id %>"
+                                                        onclick="generateMsg(event, 1)">
+                                                        <svg width="20px" height="20px" viewBox="0 0 24 24" fill="none"
+                                                            xmlns="http://www.w3.org/2000/svg">
+                                                            <path
+                                                                d="M21.9998 5.11V16.47C21.9998 17.92 20.9598 18.53 19.6898 17.83L17.7598 16.75C17.5998 16.66 17.4998 16.49 17.4998 16.31V8.99C17.4998 6.45 15.4298 4.38 12.8898 4.38H8.81984C8.44984 4.38 8.18984 3.99 8.35984 3.67C8.87984 2.68 9.91984 2 11.1098 2H18.8898C20.5998 2 21.9998 3.4 21.9998 5.11Z"
+                                                                fill="lightgrey" />
+                                                            <path
+                                                                d="M12.89 5.87891H5.11C3.4 5.87891 2 7.27891 2 8.98891V20.3489C2 21.7989 3.04 22.4089 4.31 21.7089L8.24 19.5189C8.66 19.2889 9.34 19.2889 9.76 19.5189L13.69 21.7089C14.96 22.4089 16 21.7989 16 20.3489V8.98891C16 7.27891 14.6 5.87891 12.89 5.87891ZM11 12.7489H9.75V13.9989C9.75 14.4089 9.41 14.7489 9 14.7489C8.59 14.7489 8.25 14.4089 8.25 13.9989V12.7489H7C6.59 12.7489 6.25 12.4089 6.25 11.9989C6.25 11.5889 6.59 11.2489 7 11.2489H8.25V9.99891C8.25 9.58891 8.59 9.24891 9 9.24891C9.41 9.24891 9.75 9.58891 9.75 9.99891V11.2489H11C11.41 11.2489 11.75 11.5889 11.75 11.9989C11.75 12.4089 11.41 12.7489 11 12.7489Z"
+                                                                fill="lightgrey" />
+                                                        </svg>
+                                                    </label>
+                                                    <input type="submit" id="save-<%= blogs[i].id %>" name="id"
+                                                        value="<%= blogs[i].id %>" style="display:none;">
+                                                </form>
+                                                <% } else { %>
+                                                    <form class="save-btn" action="/save" method="post">
+                                                        <label for="save-<%= blogs[i].id %>">
+                                                            <svg id="save-svg-<%= blogs[i].id %>" width="20px"
+                                                                height="20px" viewBox="0 0 24 24" fill="none"
+                                                                xmlns="http://www.w3.org/2000/svg">
+                                                                <path
+                                                                    d="M21.9998 5.11V16.47C21.9998 17.92 20.9598 18.53 19.6898 17.83L17.7598 16.75C17.5998 16.66 17.4998 16.49 17.4998 16.31V8.99C17.4998 6.45 15.4298 4.38 12.8898 4.38H8.81984C8.44984 4.38 8.18984 3.99 8.35984 3.67C8.87984 2.68 9.91984 2 11.1098 2H18.8898C20.5998 2 21.9998 3.4 21.9998 5.11Z"
+                                                                    fill="lightblue" />
+                                                                <path
+                                                                    d="M12.89 5.87891H5.11C3.4 5.87891 2 7.27891 2 8.98891V20.3489C2 21.7989 3.04 22.4089 4.31 21.7089L8.24 19.5189C8.66 19.2889 9.34 19.2889 9.76 19.5189L13.69 21.7089C14.96 22.4089 16 21.7989 16 20.3489V8.98891C16 7.27891 14.6 5.87891 12.89 5.87891ZM11 12.7489H9.75V13.9989C9.75 14.4089 9.41 14.7489 9 14.7489C8.59 14.7489 8.25 14.4089 8.25 13.9989V12.7489H7C6.59 12.7489 6.25 12.4089 6.25 11.9989C6.25 11.5889 6.59 11.2489 7 11.2489H8.25V9.99891C8.25 9.58891 8.59 9.24891 9 9.24891C9.41 9.24891 9.75 9.58891 9.75 9.99891V11.2489H11C11.41 11.2489 11.75 11.5889 11.75 11.9989C11.75 12.4089 11.41 12.7489 11 12.7489Z"
+                                                                    fill="lightblue" />
+                                                            </svg>
+                                                        </label>
+                                                        <input type="submit" id="save-<%= blogs[i].id %>" name="id"
+                                                            value="<%= blogs[i].id %>" style="display:none;">
+                                                    </form>
+                                                    <%} %>
+                                        </div>
+                                        <p class="time">
+                                            <%= blogs[i].post_time %>
+                                        </p>
+                                        <p class="clamp">
+                                            <%= blogs[i].blog_description %>
+                                        </p>
+                                        <% if(user && user.user_name==blogs[i].blog_writer) { %>
+                                            <div class="btn">
+                                                <a href="/edit/<%= blogs[i].id %>">
+                                                    <svg width="20px" height="20px" viewBox="0 -0.5 21 21" version="1.1"
+                                                        xmlns="http://www.w3.org/2000/svg"
+                                                        xmlns:xlink="http://www.w3.org/1999/xlink">
 
-                                        <title>edit_fill [#1480]</title>
-                                        <desc>Created with Sketch.</desc>
-                                        <defs>
+                                                        <title>edit_fill [#1480]</title>
+                                                        <desc>Created with Sketch.</desc>
+                                                        <defs>
 
-                                        </defs>
-                                        <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-                                            <g id="Dribbble-Light-Preview"
-                                                transform="translate(-59.000000, -400.000000)" fill="#000000">
-                                                <g id="icons" transform="translate(56.000000, 160.000000)">
-                                                    <path
-                                                        d="M3,260 L24,260 L24,258.010742 L3,258.010742 L3,260 Z M13.3341,254.032226 L9.3,254.032226 L9.3,249.950269 L19.63095,240 L24,244.115775 L13.3341,254.032226 Z"
-                                                        id="edit_fill-[#1480]" fill="green">
+                                                        </defs>
+                                                        <g id="Page-1" stroke="none" stroke-width="1" fill="none"
+                                                            fill-rule="evenodd">
+                                                            <g id="Dribbble-Light-Preview"
+                                                                transform="translate(-59.000000, -400.000000)"
+                                                                fill="#000000">
+                                                                <g id="icons"
+                                                                    transform="translate(56.000000, 160.000000)">
+                                                                    <path
+                                                                        d="M3,260 L24,260 L24,258.010742 L3,258.010742 L3,260 Z M13.3341,254.032226 L9.3,254.032226 L9.3,249.950269 L19.63095,240 L24,244.115775 L13.3341,254.032226 Z"
+                                                                        id="edit_fill-[#1480]" fill="green">
 
-                                                    </path>
-                                                </g>
-                                            </g>
-                                        </g>
-                                    </svg>
-                                </a>
+                                                                    </path>
+                                                                </g>
+                                                            </g>
+                                                        </g>
+                                                    </svg>
+                                                </a>
 
-                                <form action="/delete" method="post">
-                                    <label for="delete-<%= blogs[i].id %>">
-                                        <svg fill="#000000" width="20px" height="20px" viewBox="0 0 24 24"
-                                            xmlns="http://www.w3.org/2000/svg">
-                                            <path
-                                                d="M5.755,20.283,4,8H20L18.245,20.283A2,2,0,0,1,16.265,22H7.735A2,2,0,0,1,5.755,20.283ZM21,4H16V3a1,1,0,0,0-1-1H9A1,1,0,0,0,8,3V4H3A1,1,0,0,0,3,6H21a1,1,0,0,0,0-2Z"
-                                                fill="red" />
-                                        </svg>
-                                    </label>
-                                    <input type="submit" id="delete-<%= blogs[i].id %>" name="id"
-                                        value="<%= blogs[i].id %>" style="display:none;">
-                                </form>
-                            </div>
-                            <% } %>
+                                                <form action="/delete" method="post">
+                                                    <label for="delete-<%= blogs[i].id %>">
+                                                        <svg fill="#000000" width="20px" height="20px"
+                                                            viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                                            <path
+                                                                d="M5.755,20.283,4,8H20L18.245,20.283A2,2,0,0,1,16.265,22H7.735A2,2,0,0,1,5.755,20.283ZM21,4H16V3a1,1,0,0,0-1-1H9A1,1,0,0,0,8,3V4H3A1,1,0,0,0,3,6H21a1,1,0,0,0,0-2Z"
+                                                                fill="red" />
+                                                        </svg>
+                                                    </label>
+                                                    <input type="submit" id="delete-<%= blogs[i].id %>" name="id"
+                                                        value="<%= blogs[i].id %>" style="display:none;">
+                                                </form>
+                                            </div>
+                                            <% } %>
 
+                                    </div>
                     </div>
-                </div>
+                </a>
                 <%} } else { %>
                     <% if (activePage==="saved" ) { %>
                         <h3 style="text-align:center;">
-                            No saved blogs yet 📌 <br>
-                            Mark blogs as saved using the button beside a blog.
+                            📂 Your reading list is empty.                   
                         </h3>
+                        <p>Save interesting blogs to read them later!</p>
+                        <a href="/" class="btn-primary">Explore Blogs</a>
                         <% } else { %>
                             <h3 style="text-align:center;">
                                 No blogs yet ✍️ <br>

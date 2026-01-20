@@ -8,10 +8,12 @@
         </div>
 
         <form onsubmit="return validatePasswords()" action="/register" method="post" enctype="multipart/form-data">
-            
+
             <div class="hi">
-                <label for="profile"> <img class="profileImg" id="profileImg" src="/images/photo.jpg" width="70px"> </label>
-                <input id="profile" type="file" name="dp" accept="image/*" style="display: none;" onchange="renderImg(event, id)">
+                <label for="profile"> <img class="profileImg" id="profileImg" src="/images/photo.jpg" width="70px">
+                </label>
+                <input id="profile" type="file" name="dp" accept="image/*" style="display: none;"
+                    onchange="renderImg(event, id)">
             </div>
 
             <div class="hi">
@@ -34,13 +36,17 @@
                 <input type="password" id="confirmPassword" name="confirmPassword" required>
             </div>
 
-            <p id="message" style="color:red;"></p> <br />
+            <p id="message" style="color:red;">
+            <% if(message) { %>
+                <%= message %>
+                    <% } %>
+            </p> <br />
 
             <div>
                 <button>SignIn</button>
             </div>
 
-            <a href="/logIn">Already have an account?</a>
+            <a href="/login">Already have an account?</a>
         </form>
 
 

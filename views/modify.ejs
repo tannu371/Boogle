@@ -1,5 +1,5 @@
 <%- include("partials/header.ejs") %>
-    <% if(locals.blog) { %>
+    <% if(blog) { %>
         <div class="post">
             <form action="/update/<%= blog.id %>" method="post" enctype="multipart/form-data">
                 <input id="title-input" type="text" name="title" value="<%= blog.blog_title %>"> <br>
@@ -18,7 +18,7 @@
                     <input id="title-input" type="text" name="title" placeholder="Title Goes Here!" required> <br>
                     <label for="image"> <img id="imageImg" src="/images/image-upload.png" height="200"> </label>
                     <input id="image" type="file" name="image" accept="image/*" style="display: none;"
-                        onchange="renderImg(event, id)" required>
+                        onchange="renderImg(event, id)">
                     <br>
                     <textarea name="description" id="text-area" required>Write your thoughts here...
                                                         </textarea> <br>

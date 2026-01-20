@@ -3,11 +3,19 @@
         <h2>
             <%= blog.blog_title %>
         </h2>
-        <p class="time"> <%= blog.post_time %></p>      
-        <p> By:&nbsp <%= blog.blog_writer %> </p>
-        <img src=/image/<%= blog.image_id %> width="300px">
-        <p class="description">
-            <%= blog.blog_description %>
+        <p class="time">
+            <%= blog.post_time %>
         </p>
+        <p> By:&nbsp <%= blog.blog_writer %>
+        </p>
+        <% if(blog.image_id) { %>
+            <img src=/image/<%=blog.image_id %> alt="blog image">
+            <% } else { %>
+                <img src="/images/photo.png" alt="blog image">
+                <% } %>
+
+                    <p class="description">
+                        <%= blog.blog_description %>
+                    </p>
     </div>
     <%- include("partials/footer.ejs") %>
