@@ -15,6 +15,7 @@ import imageRoutes from "./routes/imageRoutes.js";
 
 env.config();
 const app = express();
+app.set("trust proxy", 1);
 const PostgresStore = pgSession(session);
 
 // 3. Global Middleware
