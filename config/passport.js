@@ -39,7 +39,7 @@ passport.use(
         console.log(`[RESEND DEBUG] Link for ${username}: ${verifyLink}`);
 
         // 2. Attempt to send mail
-        transporter
+        await transporter
           .sendMail({
             from: `"Boogle" <${process.env.EMAIL_USER}>`,
             to: user.email,
@@ -50,6 +50,14 @@ passport.use(
           .catch((err) =>
             console.error("❌ Resend email failed:", err.message),
           );
+
+          transporter.verify((error, success) => {
+            if (error) {
+              console.error("🔴 SMTP Connection Error:", error.message);
+            } else {
+              console.log("🟢 SMTP Server is ready to send emails");
+            }
+          });
 
         return cb(null, false, {
           message:
@@ -75,7 +83,7 @@ passport.use(
         }
       });
     } catch (err) {
-      console.error("Database error during verify:", err);
+      console.error("Error during verify:", err);
       return cb(err);
     }
   }),
