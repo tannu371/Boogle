@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Verify your email</title>
+    <link rel="stylesheet" href="../css/mail.css">
+</head>
+
+<body>
+    <div class="container">
+        <h2>Verify your email</h2>
+
+        <p>Dear <strong>{{username}}</strong>,</p>
+
+        <p>You tried to log in, but your account isn't verified. <a href="{{verifyLink}}">Click here to verify.</a></p>
+
+        <p>
+            ⏳ <strong>This link is valid for 24 hours.</strong>
+        </p>
+
+        <div class="footer">
+            <p>If you didn’t create this account, you can ignore this email.</p>
+            <p>© 2026 boogle</p>
+        </div>
+    </div>
+</body>
+
+</html>

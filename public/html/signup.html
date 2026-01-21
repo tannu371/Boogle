@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Verify your email</title>
+    <link rel="stylesheet" href="../css/mail.css">
+  </head>
+
+  <body>
+    <div class="container">
+      <h2>Verify your email</h2>
+
+      <p>Dear <strong>{{username}}</strong>,</p>
+
+      <p>
+        Thanks for signing up! Welcome to <strong>Boogle ✨</strong>
+      </p>
+
+      <p>Please verify your email by clicking the link below:</p>
+
+      <a href="{{verifyLink}}" class="btn">Verify Email</a>
+
+      <p>
+        Or copy and paste this link into your browser:
+      </p>
+
+      <p>
+        <a href="{{verifyLink}}">{{verifyLink}}</a>
+      </p>
+
+      <p>
+        ⏳ <strong>This link is valid for 24 hours.</strong>
+      </p>
+
+      <div class="footer">
+        <p>If you didn’t create this account, you can ignore this email.</p>
+        <p>© 2026 boogle</p>
+      </div>
+    </div>
+  </body>
+</html>

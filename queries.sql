@@ -20,7 +20,7 @@ CREATE TABLE users (
 CREATE TABLE blogs (
   id SERIAL PRIMARY KEY,
   post_time TIMESTAMP DEFAULT now(),
-  blog_writer TEXT REFERENCES users(user_name),
+  blog_writer TEXT REFERENCES users(user_name) ON DELETE CASCADE,     // will delete a blog too when user get deleted
   blog_title TEXT,
   blog_description TEXT,
   image_id INTEGER REFERENCES images(id)
@@ -39,3 +39,6 @@ CREATE TABLE "session" (
   "expire" timestamp(6) NOT NULL
 ) WITH (OIDS=FALSE);
 ALTER TABLE "session" ADD CONSTRAINT "session_pkey" PRIMARY KEY ("sid") NOT DEFERRABLE INITIALLY IMMEDIATE;
+
+SELECT * FROM users;
+DELETE FROM users;

@@ -5,7 +5,7 @@ import { v4 as uuidv4 } from "uuid";
 import fs from "fs";
 import multer from "multer";
 import db from "../config/db.js";
-import { transporter } from "../config/mailer.js";
+import { sendVerificationEmail } from "../utils/sendVerificationEmail.js";
 
 const router = express.Router();
 const upload = multer({ dest: "uploads/" });
@@ -47,7 +47,7 @@ router.post(
 
 // GET: Render the Sign-Up page
 router.get("/register", (req, res) => {
-  // We pass an empty message object so EJS doesn't crash 
+  // We pass an empty message object so EJS doesn't crash
   // if you use <%= message %> in the template
   res.render("signUp.ejs", { message: null });
 });
@@ -91,6 +91,16 @@ router.post("/register", upload.single("dp"), async (req, res) => {
 
       imageId = imageResult.rows[0].id;
       fs.unlinkSync(path); // Remove temp file
+
+      // 6. Send verification email
+      const verifyLink = `${process.env.BASE_URL}/verify/${token}`;
+
+      await sendVerificationEmail({
+        to: user.email,
+        username: username,
+        verifyLink,
+        templateFile: "../public/html/signup.html",
+      });
     }
 
     // 5. Insert UNVERIFIED user
@@ -103,24 +113,9 @@ router.post("/register", upload.single("dp"), async (req, res) => {
       [username, email, hashedPassword, imageId, token, expires],
     );
 
-    // 6. Send verification email
-    const verifyLink = `${process.env.BASE_URL}/verify/${token}`;
 
-    await transporter.sendMail({
-      from: `"Boogle" <${process.env.EMAIL_USER}>`,
-      to: email,
-      subject: "Verify your Boogle account",
-      html: `
-        <p>Dear <strong>${username}</strong>,</p>
-        <p>Welcome to <strong>Boogle ✨</strong></p>
-        <p>Please verify your email by clicking below:</p>
-        <p><a href="${verifyLink}" style="padding:10px 16px; background:#112d42; color:#ffffff; text-decoration:none; border-radius:6px;">Verify Email</a></p>
-        <p>⏳ Valid for 24 hours.</p>
-        <p>⏳ <strong>This link is valid for 24 hours.</strong></p>
-        <p>If you did not create this account, you can ignore this email.</p>
-        <p>Regards,<br><strong>Team Boogle</strong></p>
-      `,
-    });
+
+    
 
     // 7. Success redirect
     res.render("logIn.ejs", {

@@ -2,10 +2,11 @@ import express from "express";
 import session from "express-session";
 import pgSession from "connect-pg-simple";
 import passport from "passport";
-import env from "dotenv";
+import "dotenv/config";
 
 // 1. Import Configs
 import db from "./config/db.js"; // Starts DB connection
+import "./config/mailer.js";  // Mailers
 import "./config/passport.js"; // Sets up strategies
 
 // 2. Import Routes
@@ -13,7 +14,7 @@ import authRoutes from "./routes/authRoutes.js";
 import blogRoutes from "./routes/blogRoutes.js";
 import imageRoutes from "./routes/imageRoutes.js";
 
-env.config();
+
 const app = express();
 app.set("trust proxy", 1);
 const PostgresStore = pgSession(session);

@@ -3,7 +3,7 @@ import { Strategy } from "passport-local";
 import bcrypt from "bcrypt";
 import { v4 as uuidv4 } from "uuid";
 import db from "./db.js"; // Note the path to your db config
-import transporter from "./mailer.js";
+import {sendVerificationEmail} from "../utils/sendVerificationEmail.js"
 
 passport.use(
   "local",
@@ -21,7 +21,7 @@ passport.use(
 
       const user = result.rows[0];
 
-      // 2. Email Verification check 
+      // 2. Email Verification check
       if (!user.is_verified) {
         // 1. Generate a NEW token and expiry
         const newToken = uuidv4();
@@ -35,33 +35,17 @@ passport.use(
 
         const verifyLink = `${process.env.BASE_URL}/verify/${newToken}`;
 
-        // 1. LOG THE LINK IMMEDIATELY (Crucial for testing)
-        console.log(`[RESEND DEBUG] Link for ${username}: ${verifyLink}`);
-
         // 2. Attempt to send mail
-        await transporter
-          .sendMail({
-            from: `"Boogle" <${process.env.EMAIL_USER}>`,
-            to: user.email,
-            subject: "Resent: Verify your Boogle account",
-            html: `<p>Verify here: <a href="${verifyLink}">${verifyLink}</a></p>`,
-          })
-          .then(() => console.log("✅ Resend email successful"))
-          .catch((err) =>
-            console.error("❌ Resend email failed:", err.message),
-          );
-
-          transporter.verify((error, success) => {
-            if (error) {
-              console.error("🔴 SMTP Connection Error:", error.message);
-            } else {
-              console.log("🟢 SMTP Server is ready to send emails");
-            }
-          });
+       await sendVerificationEmail({
+         to: user.email,
+         username: user.user_name, // or just `username`
+         verifyLink,
+         templateFile: "../public/html/login.html",
+       });
 
         return cb(null, false, {
           message:
-            "📧 Account not verified. A new link has been sent to your email.",
+            "📧 Account not verified.\nA new link has been sent to your email.",
         });
       }
 
@@ -110,7 +94,6 @@ passport.deserializeUser(async (id, cb) => {
     cb(err);
   }
 });
-
 
 // passport.use(
 //   "google",

@@ -1,20 +1,25 @@
 import nodemailer from "nodemailer";
-import env from "dotenv";
-env.config();
+import { Resend } from "resend";
 
-export const transporter = nodemailer.createTransport({
-  service: "gmail",
-  host: "smtp.gmail.com",
-  port: 465,
-  secure: true, // Use SSL
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS,
-  },
-  // Increase these significantly for cloud stability
-  connectionTimeout: 30000,
-  greetingTimeout: 30000,
-  socketTimeout: 30000,
-});
+export const mailProvider = process.env.MAIL_PROVIDER || "nodemailer";
 
-export default transporter;
+// ---- Resend client ----
+export const resend =
+  mailProvider === "resend"
+    ? new Resend(process.env.RESEND_API_KEY)
+    : null;
+
+// ---- Nodemailer transporter ----
+export const transporter =
+  mailProvider === "nodemailer"
+    ? nodemailer.createTransport({
+        service: "gmail", // or SMTP config
+        host: "smtp.gmail.com",
+        port: 465,
+        secure: true,
+        auth: {
+          user: process.env.EMAIL_USER,
+          pass: process.env.EMAIL_PASS,
+        },
+      })
+    : null;
