@@ -33,16 +33,21 @@ passport.use(
           [newToken, newExpires, username],
         );
 
-        // 3. Send the email (Don't 'await' here so login response stays fast)
-        const verifyLink = `${process.env.BASE_URL}/verify/${newToken}`;
+        // 1. LOG THE LINK IMMEDIATELY (Crucial for testing)
+        console.log(`[RESEND DEBUG] Link for ${username}: ${verifyLink}`);
+
+        // 2. Attempt to send mail
         transporter
           .sendMail({
             from: `"Boogle" <${process.env.EMAIL_USER}>`,
             to: user.email,
             subject: "Resent: Verify your Boogle account",
-            html: `<p>You tried to log in, but your account isn't verified. <a href="${verifyLink}">Click here to verify.</a></p>`,
+            html: `<p>Verify here: <a href="${verifyLink}">${verifyLink}</a></p>`,
           })
-          .catch((err) => console.error("Resend email failed:", err));
+          .then(() => console.log("✅ Resend email successful"))
+          .catch((err) =>
+            console.error("❌ Resend email failed:", err.message),
+          );
 
         return cb(null, false, {
           message:
