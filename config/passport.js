@@ -33,6 +33,8 @@ passport.use(
           [newToken, newExpires, username],
         );
 
+        const verifyLink = `${process.env.BASE_URL}/verify/${token}`;
+
         // 1. LOG THE LINK IMMEDIATELY (Crucial for testing)
         console.log(`[RESEND DEBUG] Link for ${username}: ${verifyLink}`);
 
